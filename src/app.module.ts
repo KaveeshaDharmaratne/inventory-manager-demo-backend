@@ -51,12 +51,22 @@ const dbEntities = [
   GdnItem,
 ];
 
-const defaultPoolMax = 
-  process.env.VERCEL ? 2 : 10;
+function readEnv(keys: string[]): string | undefined {
+  for (const key of keys) {
+    const value = process.env[key]?.trim();
+    if (value) {
+      return value;
+    }
+  }
+  return undefined;
+}
+
+const isDemoEnvironment = readEnv(['APP_ENV']) === 'demo';
+
+const defaultPoolMax = readEnv(['VERCEL']) ? 2 : 10;
 
 const configuredPoolMax = Number.parseInt(
-  process.env.DB_POOL_MAX ??
-    String(defaultPoolMax),
+  readEnv(['DB_POOL_MAX']) ?? String(defaultPoolMax),
   10,
 );
 
@@ -69,7 +79,7 @@ const dbExtra = {
 };
 
 function getSslConfig(hostOrUrl: string | undefined): any {
-  const dbSslEnv = process.env.DB_SSL?.trim().toLowerCase();
+  const dbSslEnv = readEnv(['DB_SSL'])?.trim().toLowerCase();
   if (dbSslEnv === 'true') {
     return { rejectUnauthorized: false };
   }
@@ -87,23 +97,13 @@ function getSslConfig(hostOrUrl: string | undefined): any {
   return { rejectUnauthorized: false };
 }
 
-function readEnv(keys: string[]): string | undefined {
-  for (const key of keys) {
-    const value = process.env[key]?.trim();
-    if (value) {
-      return value;
-    }
-  }
-  return undefined;
-}
-
 function parsePort(value: string | undefined): number {
   const parsed = Number.parseInt(value ?? '5432', 10);
   return Number.isNaN(parsed) ? 5432 : parsed;
 }
 
 function getEnvTokens(): string[] {
-  const nodeEnv = (process.env.NODE_ENV ?? 'development').toUpperCase();
+  const nodeEnv = (readEnv(['NODE_ENV']) ?? 'development').toUpperCase();
   const aliases: Record<string, string[]> = {
     DEVELOPMENT: ['DEV'],
     PRODUCTION: ['PROD'],
@@ -257,6 +257,13 @@ async function createDataSourceWithFallback(
   throw lastError;
 }
 
+const migrationPaths = [
+  __dirname + '/migrations/schema/*{.ts,.js}',
+  ...(isDemoEnvironment ? [__dirname + '/migrations/demo/*{.ts,.js}'] : []),
+];
+
+const isMigrationRunEnabled = readEnv(['RUN_MIGRATIONS']) === 'true';
+
 function getTypeOrmBaseOptions(): TypeOrmModuleOptions {
   return {
     type: 'postgres',
@@ -265,8 +272,8 @@ function getTypeOrmBaseOptions(): TypeOrmModuleOptions {
     extra: dbExtra,
     dropSchema: false,
     entities: dbEntities,
-    migrations: [__dirname + '/migrations/*{.ts,.js}'],
-    migrationsRun: true,
+    migrations: migrationPaths,
+    migrationsRun: isMigrationRunEnabled,
   };
 }
 
