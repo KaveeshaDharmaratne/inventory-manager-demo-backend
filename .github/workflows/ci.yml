@@ -1,0 +1,58 @@
+name: PR Quality and Security Check
+
+on:
+  pull_request:
+    branches: ['main']
+
+jobs:
+  validate-and-build:
+    name: Quality, Test and Build
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Checkout code
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      # 2. Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '>=22.12.0'
+          cache: 'npm'
+
+      # 3. Install Dependencies
+      - name: Install Dependencies
+        run: npm ci
+
+      # # 4. Formatting Check
+      # - name: Check Formatting
+      #   run: npm run format:check
+
+      # 5. Code Quality (Linting)
+      # - name: Lint Code
+      #   run: npm run lint
+
+      # 6. Unit Tests
+      # - name: Run Unit Tests
+      #   run: npm run test
+
+      # 7. Build Check
+      # Ensures the app actually compiles without error
+      - name: Build Application
+        run: npm run build
+
+  security-check:
+    name: Security Vulnerabilities
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 8. Dependency Security (Dependency Review)
+      # Scans the PR for new vulnerabilities introduced in package-lock.json
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
