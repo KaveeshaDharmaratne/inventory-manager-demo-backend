@@ -1,98 +1,485 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+<div align="center">
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+# ⚙️ Inventory Manager Demo API
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+A sanitized NestJS backend powering the public **Inventory Manager** demo.
 
-## Description
+[![NestJS](https://img.shields.io/badge/NestJS-E0234E?logo=nestjs&logoColor=white)](https://nestjs.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![TypeORM](https://img.shields.io/badge/TypeORM-FE0803?logo=typeorm&logoColor=white)](https://typeorm.io/)
+[![Firebase](https://img.shields.io/badge/Firebase_Auth-DD2C00?logo=firebase&logoColor=white)](https://firebase.google.com/)
+[![Vercel](https://img.shields.io/badge/Deployed_on-Vercel-black?logo=vercel)](https://vercel.com/)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### 🌐 [Live API](https://inventory-manager-demo-backend.vercel.app)
 
-## Project setup
+### 🖥️ [Open Frontend Demo](https://inv-manager-frontend-alpha.vercel.app)
 
-```bash
-$ npm install
+</div>
+
+---
+
+## 📖 Overview
+
+This repository contains the backend API used by the public **Inventory Manager** demonstration.
+
+It provides REST endpoints for inventory operations including:
+
+- Stock management
+- Sales transactions
+- Dealer returns
+- Goods delivery notes
+- Invoice data
+- Transaction history
+- Bin card reports
+- Dashboard metrics
+
+The repository contains only **sanitized application code and fictional demo data**.
+
+It is completely isolated from any other deployment or database.
+
+---
+
+## 🧰 Tech Stack
+
+| Area | Technology |
+| --- | --- |
+| Framework | NestJS |
+| Language | TypeScript |
+| ORM | TypeORM |
+| Database | PostgreSQL |
+| Authentication | Firebase Admin SDK |
+| Validation | class-validator / Nest ValidationPipe |
+| Logging | Winston |
+| API Style | REST |
+| Demo Hosting | Vercel Functions |
+
+---
+
+## 🔐 Authentication
+
+The public demo frontend uses Firebase Anonymous Authentication.
+
+After authentication, the frontend obtains a Firebase ID token and sends it with API requests:
+
+```http
+Authorization: Bearer <firebase-id-token>
 ```
 
-## Compile and run the project
+The backend verifies the token using the Firebase Admin SDK before allowing access to protected routes.
 
-```bash
-# development
-$ npm run start
+Example flow:
 
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+```text
+Guest
+  │
+  ▼
+Firebase Anonymous Login
+  │
+  ▼
+Firebase ID Token
+  │
+  ▼
+Authorization: Bearer <token>
+  │
+  ▼
+FirebaseAuthGuard
+  │
+  ▼
+Protected Controller
 ```
 
-## Run tests
+The root health endpoint remains public for deployment monitoring.
 
-```bash
-# unit tests
-$ npm run test
+---
 
-# e2e tests
-$ npm run test:e2e
+## 🛡️ Demo Isolation
 
-# test coverage
-$ npm run test:cov
+The API is intentionally separated from other environments.
+
+The demo deployment uses its own:
+
+- PostgreSQL database
+- Firebase project
+- Firebase service account
+- Environment variables
+- Vercel deployment
+- Allowed CORS frontend origin
+- Fictional seed data
+
+No private or operational database is connected to this repository.
+
+---
+
+## 📁 Project Structure
+
+```text
+src/
+├── auth/              # Firebase authentication
+├── common/            # Filters, logging and shared utilities
+├── migrations/        # Database schema + demo seed migrations
+├── modules/           # Feature modules
+├── app.controller.ts
+├── app.module.ts
+├── app.service.ts
+└── main.ts
 ```
 
-## Deployment
+A typical feature module follows NestJS separation of concerns:
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+```text
+feature/
+├── dto/
+├── entities/
+├── feature.controller.ts
+├── feature.service.ts
+└── feature.module.ts
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Resources
+## 🗄️ Database
 
-Check out a few resources that may come in handy when working with NestJS:
+The API uses PostgreSQL through TypeORM.
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+Database configuration is supplied through environment variables:
 
-## Support
+```env
+DATABASE_URL=postgresql://...
+DB_SSL=true
+DB_POOL_MAX=2
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+The public demo database contains only fictional records.
 
-## Stay in touch
+### Migrations
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Schema changes are maintained using TypeORM migrations.
 
-## License
+```text
+src/migrations/
+├── schema/
+│   └── ...
+└── demo/
+    └── SeedDemoData.ts
+```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Automatic migration execution is controlled using:
+
+```env
+RUN_MIGRATIONS=false
+```
+
+For deployed environments, migrations should be executed deliberately rather than on every serverless cold start.
+
+---
+
+## 🌱 Demo Data
+
+Demo seed data is created specifically for this repository.
+
+It may include fictional:
+
+- Products
+- Dealers
+- Phone numbers
+- Addresses
+- Inventory quantities
+- Sales
+- Returns
+- Delivery notes
+- Transaction histories
+
+Example domains such as `example.com` should be used for fictional email addresses.
+
+The demo repository should never contain database dumps or imported operational datasets.
+
+---
+
+## ⚙️ Environment Variables
+
+Create a local `.env` file.
+
+```env
+NODE_ENV=development
+APP_ENV=demo
+
+# Authentication
+REQUIRE_AUTH=false
+FIREBASE_SERVICE_ACCOUNT_BASE64=
+
+# Database
+DATABASE_URL=
+DB_SSL=true
+DB_POOL_MAX=2
+
+# Database migrations
+RUN_MIGRATIONS=false
+
+# CORS
+FRONTEND_URLS=http://localhost:5173
+```
+
+### Production demo deployment
+
+```env
+NODE_ENV=production
+APP_ENV=demo
+
+REQUIRE_AUTH=true
+
+DATABASE_URL=<demo-postgresql-url>
+DB_SSL=true
+DB_POOL_MAX=2
+
+RUN_MIGRATIONS=false
+
+FIREBASE_SERVICE_ACCOUNT_BASE64=<base64-service-account>
+
+FRONTEND_URLS=https://inv-manager-frontend-alpha.vercel.app
+```
+
+> Never commit `.env`, Firebase service-account JSON files, database passwords, private keys, or connection credentials.
+
+---
+
+## 🔒 CORS
+
+The API accepts browser requests only from explicitly configured frontend origins.
+
+```env
+FRONTEND_URLS=https://inv-manager-frontend-alpha.vercel.app
+```
+
+Local development origins can be enabled when `NODE_ENV` is not `production`.
+
+Firebase-authenticated requests use:
+
+```http
+Authorization: Bearer <token>
+```
+
+so the API is configured to support authenticated CORS preflight requests.
+
+---
+
+## 🚦 API Health Check
+
+The root route is publicly accessible:
+
+```http
+GET /
+```
+
+Example:
+
+```json
+{
+  "name": "Inventory Manager API",
+  "status": "ok"
+}
+```
+
+Live endpoint:
+
+```text
+https://inventory-manager-demo-backend.vercel.app/
+```
+
+---
+
+## 🔌 API Areas
+
+The API is organized around inventory workflows such as:
+
+```text
+/stock-overview
+/products
+/dealers
+/sales
+/returns
+/gdn
+/invoices
+/reports
+```
+
+Individual endpoint naming may vary by feature module.
+
+Protected routes require a valid Firebase ID token.
+
+---
+
+## 🛠️ Getting Started
+
+### Prerequisites
+
+- Node.js 22
+- npm
+- PostgreSQL
+- Firebase project with Authentication enabled
+
+### Clone the repository
+
+```bash
+git clone https://github.com/KaveeshaDharmaratne/<demo-backend-repository>.git
+cd <demo-backend-repository>
+```
+
+Replace the placeholder with the public demo backend repository name.
+
+### Install dependencies
+
+```bash
+npm install
+```
+
+### Configure environment variables
+
+Create:
+
+```text
+.env
+```
+
+using `.env.example` as the starting point.
+
+### Run the API locally
+
+```bash
+npm run start:dev
+```
+
+The API will normally start at:
+
+```text
+http://localhost:3000
+```
+
+---
+
+## 📜 Common Commands
+
+| Command | Description |
+| --- | --- |
+| `npm run start:dev` | Start development mode |
+| `npm run build` | Compile the NestJS application |
+| `npm run start:prod` | Run the compiled application |
+| `npm run lint` | Run ESLint |
+| `npm test` | Run tests |
+
+---
+
+## 🧪 Testing
+
+Run tests:
+
+```bash
+npm test
+```
+
+Build verification:
+
+```bash
+npm run build
+```
+
+Before deploying, verify:
+
+```text
+✓ Application builds successfully
+✓ Demo database connection works
+✓ Firebase token verification works
+✓ Unauthorized API requests are rejected
+✓ CORS accepts only configured origins
+✓ No private data exists in seed files
+```
+
+---
+
+## 🌐 Deployment
+
+The demo backend is deployed independently to Vercel.
+
+### Deployment flow
+
+```text
+GitHub
+   │
+   ▼
+Vercel Build
+   │
+   ▼
+NestJS Function
+   │
+   ├── Firebase Admin
+   │
+   └── PostgreSQL
+```
+
+Environment variables are configured directly in the Vercel project rather than committed to Git.
+
+### Serverless considerations
+
+The demo configuration uses:
+
+```env
+DB_POOL_MAX=2
+RUN_MIGRATIONS=false
+```
+
+to avoid excessive database connections and migration execution during serverless application initialization.
+
+File-based logging is disabled in the Vercel environment in favour of platform console logs.
+
+---
+
+## 🔗 Related Project
+
+### Inventory Manager Frontend
+
+[**Open the Frontend Repository**](https://github.com/KaveeshaDharmaratne/inv-manager-frontend)
+
+[**Launch the Demo**](https://inv-manager-frontend-alpha.vercel.app)
+
+---
+
+## 🔏 Security Notes
+
+This is a public demonstration API.
+
+Even though all demo data is fictional, the application still follows several production-style security practices:
+
+- Authenticated protected routes
+- Firebase ID-token verification
+- Environment-based secrets
+- Restricted CORS origins
+- Request DTO validation
+- Separate database environment
+- No committed credentials
+- No operational datasets
+
+---
+
+## 👨‍💻 Author
+
+Developed and maintained by [Kaveesha Dharmaratne](https://github.com/KaveeshaDharmaratne) & [Lahiru Wimalarathna](https://github.com/lahiruC22).
+
+---
+
+## 📄 License
+
+This repository is publicly available for portfolio and demonstration purposes.
+
+No open-source license is currently granted.
+
+---
+
+<div align="center">
+
+**Backend API for the Inventory Manager public demo.**
+
+[🖥️ Open Demo](https://inv-manager-frontend-alpha.vercel.app)
+&nbsp;•&nbsp;
+[🌐 API](https://inventory-manager-demo-backend.vercel.app)
+
+</div>
